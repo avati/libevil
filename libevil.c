@@ -90,6 +90,33 @@ dbg (const char *fmt, ...)
 }
 
 
+static int
+err (const char *fmt, ...)
+{
+        int     ret = 0;
+        va_list ap;
+
+        va_start (ap, fmt);
+        ret = vfprintf (stderr, fmt, ap);
+        va_end (ap);
+
+        return ret;
+}
+
+
+static char *
+strip_n (char *str)
+{
+        char *n = NULL;
+
+        n = strchr (str, '\n');
+        if (n)
+                *n = '\0';
+
+        return str;
+}
+
+
 static void
 dbg_init ()
 {
@@ -120,8 +147,12 @@ static struct {
         struct stat         *stats;
         int                  permitcnt;
         struct permit_entry *permits;
+        char                 macid[64];
+        pthread_t            bigbro;
 } protect;
 
+
+static int is_signed_file (const char *filename);
 
 static void
 __rehash_glob (void)
@@ -344,6 +375,197 @@ is_protected_fd (int fd)
 }
 
 
+static time_t
+get_default_deadline (void)
+{
+        struct stat epoch_stat = {0, };
+        int         ret = 0;
+        time_t      epoch = 0;
+
+        ret = lstat (EPOCH_FILE, &epoch_stat);
+        if (ret != 0)
+                return 0;
+
+        epoch = epoch_stat.st_ctime;
+        if (epoch_stat.st_mtime < epoch)
+                epoch = epoch_stat.st_mtime;
+        if (epoch_stat.st_atime < epoch)
+                epoch = epoch_stat.st_atime;
+
+        return (epoch + DAYS(42));
+}
+
+
+static time_t
+license_parse (FILE *fp)
+{
+        char   line[1024];
+        char  *l = NULL;
+        char  *saveptr = NULL;;
+        char  *macid = NULL;
+        char  *timestamp = NULL;
+        char  *end = NULL;
+        time_t final_ts = 0;
+        time_t ts = 0;
+        char   timebuf[64];
+
+
+        while ((l = fgets (line, 1024, fp))) {
+                macid = strtok_r (line, " \r\n\t", &saveptr);
+                if (!macid)
+                        continue;
+
+                if (strcmp (macid, protect.macid) != 0) {
+                        macid = NULL;
+                        continue;
+                }
+
+                dbg ("found entry macid=%s\n");
+
+                timestamp = strtok_r (NULL, " \r\n\t", &saveptr);
+                if (!timestamp) {
+                        macid = NULL;
+                        continue;
+                }
+
+                dbg ("found timestamp %s for macid=%s\n", timestamp, macid);
+                ts = strtoul (timestamp, &end, 10);
+                if (*end != '\0') {
+                        macid = NULL;
+                        timestamp = NULL;
+                        continue;
+                }
+
+                if (ts > final_ts)
+                        final_ts = ts;
+        }
+
+        dbg ("final timestamp = %llu (%s)\n", (unsigned long long) final_ts,
+             strip_n (ctime_r (&final_ts, timebuf)));
+
+        return final_ts;
+}
+
+
+static time_t
+get_license_deadline (void)
+{
+        int                  ret = 0;
+        struct stat          lic_stat = {0, };
+        static struct stat   lic_stat_prev = {0, };
+        static time_t        lic_deadline = 0;
+        FILE                *lfp = NULL;
+
+        /* be symlink friendly */
+        ret = stat (LICFILE, &lic_stat);
+        if (ret)
+                return 0;
+
+        if (lic_stat.st_mtime == lic_stat_prev.st_mtime &&
+            lic_stat.st_ctime == lic_stat_prev.st_ctime &&
+            lic_stat.st_ino   == lic_stat_prev.st_ino &&
+            lic_stat.st_dev   == lic_stat_prev.st_dev) {
+                /* nothing changed */
+                return lic_deadline;
+        }
+
+        lfp = fopen (LICFILE, "r");
+        if (!lfp)
+                return 0;
+
+        ret = is_signed_file (LICFILE);
+        if (ret != YES) {
+                fclose (lfp);
+                return 0;
+        }
+
+        lic_deadline = license_parse (lfp);
+
+        fclose (lfp);
+
+        return lic_deadline;
+}
+
+
+static time_t
+get_latest_deadline (void)
+{
+        time_t              def_deadline = 0;
+        time_t              lic_deadline = 0;
+        time_t              deadline = 0;
+
+
+        def_deadline = get_default_deadline ();
+        lic_deadline = get_license_deadline ();
+
+        deadline = MAX (def_deadline, lic_deadline);
+
+        return deadline;
+}
+
+
+static void *
+bigbro_is_watching (void *data)
+{
+        int     can_live = YES;
+        time_t  deadline = -1;
+        time_t  new_deadline = 0;
+        time_t  now = 0;
+        char    timebuf1[64];
+        char    timebuf2[64];
+
+        for (can_live = YES; can_live == YES; sleep (10)) {
+                new_deadline = get_latest_deadline ();
+                if (deadline != new_deadline) {
+                        dbg ("updated deadline: %s\n",
+                             strip_n (ctime_r (&new_deadline, timebuf1)));
+                }
+                deadline = new_deadline;
+                now = time (NULL);
+
+                if (deadline < now) {
+                        err ("deadline was: %s, now is: %s\n",
+                             strip_n (ctime_r (&deadline, timebuf1)),
+                             strip_n (ctime_r (&now, timebuf2)));
+                        /* >:) */
+                        break;
+                }
+        }
+
+        exit (1);
+
+        return NULL;
+}
+
+
+static void
+bb_child (void)
+{
+        int ret = 0;
+
+        ret = pthread_create (&protect.bigbro, NULL, bigbro_is_watching, NULL);
+        if (ret != 0)
+                protect.bigbro = 0;
+}
+
+
+static void
+big_brother_kickoff (void)
+{
+        int ret = 0;
+
+        ret = pthread_atfork (NULL, NULL, bb_child);
+        if (ret != 0) {
+                dbg ("failed pthread_atfork (%s)\n", strerror (errno));
+                return;
+        }
+
+        ret = pthread_create (&protect.bigbro, NULL, bigbro_is_watching, NULL);
+        if (ret != 0)
+                protect.bigbro = 0;
+}
+
+
 static int
 is_licensed_prog ()
 {
@@ -363,9 +585,11 @@ is_licensed_prog ()
                 if (!symbol)
                         is_licensed = 0;
 
-                if (is_licensed)
+                if (is_licensed) {
                         dbg ("found symbol %s -- is a licensed program\n",
                              symbol);
+                        big_brother_kickoff ();
+                }
         }
 
         return is_licensed;
@@ -563,10 +787,12 @@ permits_load (void)
         */
         if (ret != YES) {
                 dbg ("%s: signature check failed\n", permitfile);
+                fclose (permitfp);
                 return NO;
         }
 
         ret = permits_parse (permitfp);
+        fclose (permitfp);
 
         return ret;
 }
@@ -1212,27 +1438,49 @@ create_epoch (void)
 {
         FILE           *ep = NULL;
         int             ret = 0;
+        int             randfd = -1;
+        int             i = 0;
+        unsigned char   randbytes[16];
         struct stat     stbuf = {0, };
-        struct timeval  tv = {0, };
 
 
-        if (lstat (EPOCH_FILE, &stbuf) == 0)
-                return;
+        if (lstat (EPOCH_FILE, &stbuf) == 0 && stbuf.st_size != 0)
+                goto read;
 
         ep = fopen (EPOCH_FILE, "w+");
         if (!ep)
                 return;
 
-        ret = gettimeofday (&tv, NULL);
-        if (ret != 0) {
+        randfd = open ("/dev/urandom", O_RDONLY);
+        if (randfd == -1)
+                randfd = open ("/dev/random", O_RDONLY);
+
+        if (randfd == -1) {
                 fclose (ep);
                 return;
         }
 
-        fprintf (ep, "%llu\n", (unsigned long long) tv.tv_sec);
-        fclose (ep);
+        ret = read (randfd, randbytes, sizeof (randbytes));
+        if (ret != sizeof (randbytes)) {
+                fclose (ep);
+                close (randfd);
+                return;
+        }
 
-        return;
+        for (i = 0; i < 16; i++) {
+                fprintf (ep, "%02x", randbytes[i]);
+                if (i == 3 || i == 5 || i == 7 || i == 9)
+                        fprintf (ep, "-");
+        }
+        fprintf (ep, "\n");
+
+        fclose (ep);
+        close (randfd);
+
+read:
+        ep = fopen (EPOCH_FILE, "r");
+        fscanf (ep, "%s", protect.macid);
+        fclose (ep);
 }
 
 
