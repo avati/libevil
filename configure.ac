@@ -18,8 +18,6 @@ AC_INIT([libevil],[0.666],[support@gluster.com])
 
 AM_INIT_AUTOMAKE
 
-AM_CONFIG_HEADER([config.h])
-
 AC_CONFIG_FILES([Makefile
                 gluster-lic-setup
                 gluster-lic-request
