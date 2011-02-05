@@ -1,0 +1,29 @@
+#!/bin/bash
+
+
+function main()
+{
+    if [ ! -d /lic ]; then
+        mkdir -p /lic;
+        cp @prefix@/ldpreload/gpgv /lic;
+        cp @prefix@/ldpreload/pubring.gpg /lic;
+    fi
+
+    if [ ! -e /lib/libevil.so ]; then
+        cp @prefix@/ldpreaload/libevil.so /lib;
+        chmod g+s /lib/libevil.so;
+        chown root:root /lib/libevil.so;
+    fi
+
+    if [ ! -e /.epoch ]; then
+        uuidgen -r > /.epoch;
+    fi
+
+    if [ ! -e /etc/glusterd/glusterd.info ]; then
+        uuid=$(cat /.epoch);
+        mkdir -p /etc/glusterd;
+        echo "UUID=$uuid" > /etc/glusterd/glusterd.info;
+    fi
+}
+
+main "$@";

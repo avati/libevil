@@ -1,0 +1,60 @@
+#!/bin/bash
+
+
+function validate_license()
+{
+    echo -n "Validating signature ... "
+
+    /lic/gpgv --verify --keyring /lic/pubring.gpg "$1" >/dev/null 2>&1;
+
+    if [ $? -ne 0 ]; then
+        echo "FAILED."
+        exit 1;
+    fi
+
+    echo "done."
+
+    true
+}
+
+
+function main()
+{
+    server_list=$(gluster peer status 2>/dev/null | grep -i hostname: | cut -f2 -d: );
+
+    if [ -z "$server_list" ]; then
+        cat <<EOF
+
+You do not seem to have a Gluster cluster setup yet. Please prepare the cluster
+by building a trusted network of Gluster servers using the command.
+
+  sh# gluster peer probe <HOSTNAME>
+
+For more information refer the documentation available at
+
+  http://www.gluster.com/community/documentation/
+
+EOF
+        exit
+    fi
+
+    if [ $# -ne 2 ];
+        cat <<EOF
+
+Usage: $0 <LICENSE.ASC>
+
+EOF
+        exit 1
+    fi
+
+    validate_license $1;
+
+    for server in $server_list; do
+        scp "$1" $server:/lic/license.asc;
+        if [ $? -ne 0 ]; then
+            echo "Installing license on $server failed";
+        fi
+    done
+}
+
+main "$@";

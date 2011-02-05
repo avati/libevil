@@ -20,7 +20,11 @@ AM_INIT_AUTOMAKE
 
 AM_CONFIG_HEADER([config.h])
 
-AC_CONFIG_FILES([Makefile])
+AC_CONFIG_FILES([Makefile
+                gluster-lic-setup
+                gluster-lic-request
+                gluster-lic-install
+                gluster-lic-sign])
 
 AC_CANONICAL_HOST
 

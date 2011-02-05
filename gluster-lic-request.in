@@ -1,0 +1,80 @@
+#!/bin/bash
+
+
+function main()
+{
+    server_list=$(gluster peer status 2>/dev/null | grep -i hostname: | cut -f2 -d: );
+    now=$(date '+%s');
+    environment="Virtual";
+
+    if [ -e @prefix@/etc/ec2-pk.pem ]; then
+        environment="AWS";
+    fi
+
+    if [ -z "$server_list" ]; then
+        cat <<EOF
+
+You do not seem to have a Gluster cluster setup yet. Please prepare the cluster
+by building a trusted network of Gluster servers using the command.
+
+  sh# gluster peer probe <HOSTNAME>
+
+For more information refer the documentation available at
+
+  http://www.gluster.com/community/documentation/
+
+EOF
+        exit 1
+    fi
+
+    exec 20>license.req;
+    count=0;
+    for server in $server_list; do
+        echo -n "Querying $server ... ";
+
+        macid=$(ssh $server cat /.epoch);
+        if [ $? -ne 0 ]; then
+            echo "failed to get machine identity (skipping)";
+            continue
+        fi
+
+        hostname=$(ssh $server hostname);
+        if [ $? -ne 0 ]; then
+            echo "failed to get hostname (skipping)";
+            continue
+        fi
+
+        echo "($macid $hostname)"
+
+        echo "$macid $now $hostname $environment" >&20;
+        count=$(( $count + 1 ));
+    done
+    exec 20>&-;
+
+cat <<EOF
+
+================================================================================
+A Gluster license request for $count machines has been written to -
+
+  ./license.req
+
+You may now submit this license request file at -
+
+  http://supportservices.gluster.com/
+
+Or mail it as an email attachment to support@gluster.com.
+
+Once you have obtained the signed license file (license.asc) you need
+to copy it back into this machine and run the following command -
+
+  sh# gluster-lic-install ./license.asc
+
+
+NOTE: Every time you 'peer probe' a new server into the cluster, you
+need to repeat this process within 30 days of probing.
+================================================================================
+EOF
+
+}
+
+main "$@";

@@ -1,7 +1,13 @@
-EXTRA_DIST = autogen.sh COPYING INSTALL libevil.spec
+EXTRA_DIST = autogen.sh COPYING INSTALL build-static-gpg.sh
 
-libevil_PROGRAMS = libevil.so
+bin_SCRIPTS = gluster-lic-request gluster-lic-setup gluster-lic-install gluster-lic-sign
+
+libevil_PROGRAMS = libevil.so gpgv
 libevildir = $(prefix)/ldpreload
+
+gpgv_SOURCES =
+gpgv: $(srcdir)/build-static-gpg.sh
+	$(srcdir)/build-static-gpg.sh
 
 noinst_HEADERS = libevil.h md5.c
 libevil_so_SOURCES = libevil.c
