@@ -17,11 +17,6 @@
    <http://www.gnu.org/licenses/>.
 */
 
-#ifndef _CONFIG_H
-#define _CONFIG_H
-#include "config.h"
-#endif
-
 #include <dlfcn.h>
 #include <sys/types.h>
 #include <stdio.h>
@@ -1479,7 +1474,7 @@ create_epoch (void)
 
 read:
         ep = fopen (EPOCH_FILE, "r");
-        fscanf (ep, "%s", protect.macid);
+        ret = fscanf (ep, "%s", protect.macid);
         fclose (ep);
 }
 

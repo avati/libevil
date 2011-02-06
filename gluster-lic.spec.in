@@ -1,0 +1,56 @@
+%define release 1%{?dist}
+
+Summary: Gluster Licensing
+Name: @PACKAGE_NAME@
+Version: @PACKAGE_VERSION@
+Release: %{release}
+License: AGPLv3+
+Packager: @PACKAGE_BUGREPORT@
+Group: Applications/System
+URL: http://www.gluster.com
+Vendor: Gluster Inc
+Source0: %{name}-%{version}.tar.gz
+BuildRoot: %{_tmppath}/%{name}-%{version}-root
+Requires: gvsa-base
+Requires(post): /sbin/chkconfig
+Requires(preun): /sbin/service, /sbin/chkconfig
+Requires(postun): /sbin/service
+
+%description
+Gluster Licensing
+
+%prep
+%setup -q
+
+%build
+
+./configure --program-prefix=  --prefix=/opt/gvsa --datadir=/opt/gvsa/share --localstatedir=/var --mandir=/usr/share/man --infodir=/usr/share/info
+%{__make}
+
+%install
+%{__rm} -rf %{buildroot}
+%{__make} install DESTDIR=%{buildroot}
+
+
+%clean
+%{__rm} -rf %{buildroot}
+
+%files
+%defattr(-,root,root,-)
+/opt/gvsa/bin/gluster-lic-install
+/opt/gvsa/bin/gluster-lic-setup
+/opt/gvsa/bin/gluster-lic-request
+/opt/gvsa/bin/gluster-lic-sign
+/opt/gvsa/ldpreload/libevil.so
+/opt/gvsa/ldpreload/gpgv
+
+
+%post
+cp /opt/gvsa/bin/gluster-lic-setup /etc/init.d
+chkconfig gluster-lic-setup on
+
+
+%changelog
+* Tue Jan 11 2011  <harsha@gluster.com> - ami-tools
+- Initial build.
+
