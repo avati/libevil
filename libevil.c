@@ -1388,15 +1388,11 @@ TRAP (pivot_root, (const char *new_root, const char *old_put))
 int
 TRAP (chroot, (const char *path))
 {
-        errno = EPERM;
-        return -1;
-#if 0
         int   ret = 0;
 
         ret = real_chroot (path);
 
         return ret;
-#endif
 }
 
 
