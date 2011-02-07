@@ -5,7 +5,7 @@ function validate_license()
 {
     echo -n "Validating signature ... "
 
-    /lic/gpgv --verify --keyring /lic/pubring.gpg "$1" >/dev/null 2>&1;
+    /lic/gpgv --keyring /lic/pubring.gpg "$1" >/dev/null 2>&1;
 
     if [ $? -ne 0 ]; then
         echo "FAILED."
@@ -38,7 +38,7 @@ EOF
         exit
     fi
 
-    if [ $# -ne 2 ];
+    if [ $# -ne 1 ]; then
         cat <<EOF
 
 Usage: $0 <LICENSE.ASC>
@@ -49,7 +49,7 @@ EOF
 
     validate_license $1;
 
-    for server in $server_list; do
+    for server in $server_list localhost; do
         scp "$1" $server:/lic/license.asc;
         if [ $? -ne 0 ]; then
             echo "Installing license on $server failed";

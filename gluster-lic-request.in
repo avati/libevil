@@ -29,7 +29,7 @@ EOF
 
     exec 20>license.req;
     count=0;
-    for server in $server_list; do
+    for server in $server_list localhost; do
         echo -n "Querying $server ... ";
 
         macid=$(ssh $server cat /.epoch);
