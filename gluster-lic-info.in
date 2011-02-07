@@ -1,0 +1,122 @@
+#!/bin/bash
+
+
+function default_expiry()
+{
+    aT=$(stat -c '%X' /.epoch);
+    mT=$(stat -c '%Y' /.epoch);
+    cT=$(stat -c '%Z' /.epoch);
+
+    dE=$((echo $aT; echo $mT; echo $cT) | sort -n | head -n 1);
+
+    echo $dE;
+}
+
+
+function say_and_die()
+{
+    if [ $now -gt $expire ]; then
+        status=dead;
+    else
+        status=alive;
+    fi
+
+    case "$mode" in
+        unlicensed)
+            cat <<EOF
+This system is unlicensed. To obtain a license you have to first generate
+a license request and get it signed. Note that a license request is for the
+entire cluster of systems and therefore you need to first start all your
+systems (ensure ssh connectivity among them) and peer probe them all as well.
+
+To generate a license request, run this command and follow the instructions:
+
+  sh# gluster-lic-request
+
+EOF
+            ;;
+        invalid_license)
+            cat <<EOF
+The license file in place is invalid (signature verification failed.) Please
+contact Gluster support at support@gluster.com for any questions.
+
+EOF
+            ;;
+        licensed)
+            if [ $status = "alive" ]; then
+                cat <<EOF
+You have a valid license for $count systems.
+EOF
+            else
+                cat <<EOF
+You had a license for $count systems which has expired.
+EOF
+            fi
+            ;;
+        mislicensed)
+            cat <<EOF
+Your license file is not valid on this system. Please contact Gluster support
+at support@gluster.com for any questions.
+EOF
+            ;;
+    esac
+
+    if [ $status = "alive" ]; then
+        delta=$(($expire - $now));
+        days=$(($delta / (3600 * 24)));
+        cat <<EOF
+This system is licensed for the next $days day(s), till $(date -u --date="1970-01-01 00:00:00 $expire seconds").
+EOF
+    else
+        delta=$(($now - $expire));
+        days=$(($delta / (3600 * 24)));
+        cat <<EOF
+This system license has been expired for the last $days day(s), since $(date -u --date="1970-01-01 00:00:00 $expire seconds").
+EOF
+    fi
+}
+
+
+function main()
+{
+    macid=$(cat /.epoch 2>/dev/null);
+
+    if [ -z "$macid" ]; then
+        cat <<EOF
+This machine has not been setup for gluster licensing. Please run:
+
+  sh# gluster-lic-setup
+
+The above setup will prepare the machine for license management.
+EOF
+        exit 1
+    fi
+
+    now=$(date '+%s');
+
+    def_expire=$(( $(default_expiry) + 30 * 24 * 3600 ));
+
+    if [ ! -f /lic/license.asc ]; then
+        expire=$def_expire;
+        mode=unlicensed;
+    else
+        /lic/gpgv --keyring /lic/pubring.gpg /lic/license.asc >/dev/null 2>&1;
+        if [ $? -ne 0 ]; then
+            mode=invalid_license;
+            expire=$def_expire;
+        else
+            count=$(grep '^........-....-....-....-............ ' /lic/license.asc | wc -l);
+            if grep -q "^$macid " /lic/license.asc; then
+                expire=$(grep "^$macid " /lic/license.asc | cut -f2 -d' ');
+                mode=licensed;
+            else
+                expire=$def_expire;
+                mode=mislicensed;
+            fi
+        fi
+    fi
+
+    say_and_die;
+}
+
+main "$@";
