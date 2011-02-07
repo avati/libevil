@@ -84,7 +84,7 @@ function validate_num_days()
     if [ $numdays -gt 366 ]; then
         cat >&2 <<EOF
 ================================================================================
- WARNING: Generating a license for an unusually high ($1) number of days!!
+ WARNING: Generating a license for an unusually high ($numdays) number of days!!
 ================================================================================
                      [Hit ENTER to continue]
 EOF
