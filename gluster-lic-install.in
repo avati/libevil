@@ -55,6 +55,8 @@ EOF
             echo "Installing license on $server failed";
         fi
     done
+
+    @prefix@/bin/gluster-lic-info
 }
 
 main "$@";
