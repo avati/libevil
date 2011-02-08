@@ -37,6 +37,7 @@ Gluster Licensing
 
 %files
 %defattr(-,root,root,-)
+/etc/profile.d/gluster-lic.sh
 /opt/gvsa/bin/gluster-lic-install
 /opt/gvsa/bin/gluster-lic-setup
 /opt/gvsa/bin/gluster-lic-request

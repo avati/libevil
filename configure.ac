@@ -24,7 +24,8 @@ AC_CONFIG_FILES([Makefile
                 gluster-lic-install
                 gluster-lic-sign
                 gluster-lic-info
-                gluster-lic.spec])
+                gluster-lic.spec
+                gluster-lic.sh])
 
 AC_CANONICAL_HOST
 
