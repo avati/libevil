@@ -37,7 +37,9 @@
 #include "libevil.h"
 #include "md5.c"
 
-#define DEBUG 1
+#ifdef DEBUG
+#undef DEBUG
+#endif
 
 static const char *protpatterns[] =  {
         EPOCH_FILE,
