@@ -883,8 +883,8 @@ TRAP (rename, (const char *oldpath, const char *newpath))
         if (is_licensed_prog ())
                 goto green;
 
-        if (!is_protected_entry (newpath))
-                goto green;
+        if (is_protected_entry (newpath))
+                goto red;
 
         if (is_protected_entry (oldpath))
                 goto red;
@@ -911,8 +911,8 @@ TRAP (renameat, (int olddirfd, const char *oldpath,
         if (is_licensed_prog ())
                 goto green;
 
-        if (!is_protected_atentry (newdirfd, newpath))
-                goto green;
+        if (is_protected_atentry (newdirfd, newpath))
+                goto red;
 
         if (is_protected_atentry (olddirfd, oldpath))
                 goto red;
