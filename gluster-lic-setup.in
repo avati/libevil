@@ -1,22 +1,45 @@
-#!/bin/bash
+#!/bin/bash -e
 #
 # chkconfig: 35 50 12
 # description: Licensing kick-in
 #
+
+prefix=@prefix@;
+exec_prefix=@exec_prefix@;
+sysconfdir=@sysconfdir@;
+bindir=@bindir@;
+libdir=@libdir@;
+
+
+function install_libevil()
+{
+    le32so=$(file ${exec_prefix}/lib*/libevil* | grep 32-bit | cut -f1 -d:);
+    ld32so=$(file /lib*/ld-* | grep 32-bit | cut -f1 -d: | head -n1);
+    ld32dir=$(dirname "$ld32so");
+
+    le64so=$(file ${exec_prefix}/lib*/libevil* | grep 64-bit | cut -f1 -d:);
+    ld64so=$(file /lib*/ld-* | grep 64-bit | cut -f1 -d: | head -n1);
+    ld64dir=$(dirname "$ld64so");
+
+    if [ ! -z "$le32so" -a ! -z "$ld32so" ]; then
+        cp $le32so $ld32dir/libevil32.so;
+        sed -i 's/ld.so.preload/ld.32.preload/' $ld32so;
+        echo $ld32dir/libevil32.so > /etc/ld.32.preload;
+    fi
+
+    if [ ! -z "$le64so" -a ! -z "$ld64so" ]; then
+        cp $le64so $ld64dir/libevil64.so;
+        echo $ld64dir/libevil64.so > /etc/ld.so.preload;
+    fi
+}
 
 
 function main()
 {
     if [ ! -d /lic ]; then
         mkdir -p /lic;
-        cp @prefix@/ldpreload/gpgv /lic;
-        cp @prefix@/ldpreload/pubring.gpg /lic;
-    fi
-
-    if [ ! -e /lib/libevil.so ]; then
-        cp @prefix@/ldpreload/libevil.so /lib;
-        chown root:root /lib/libevil.so;
-        chmod g+s /lib/libevil.so;
+        cp @bindir@/gpgv /lic;
+        cp @sysconfdir@/pubring.gpg /lic;
     fi
 
     if [ ! -e /.epoch ]; then
@@ -29,9 +52,7 @@ function main()
         echo "UUID=$uuid" > /etc/glusterd/glusterd.info;
     fi
 
-    if [ ! -e /etc/ld.so.preload ]; then
-        echo /lib/libevil.so > /etc/ld.so.preload;
-    fi
+    install_libevil;
 }
 
 main "$@";

@@ -37,36 +37,24 @@
 #include "libevil.h"
 #include "md5.c"
 
-#ifdef DEBUG
-#undef DEBUG
-#endif
 
 static const char *protpatterns[] =  {
         EPOCH_FILE,
         LICDIR,
         LICDIR "/gpgv",
         LICDIR "/pubring.gpg",
-        "/etc/",
-        "/etc/ld.so.preload",
-        "/etc/ld.32.preload",
-#ifdef DEBUG
-        LICDIR "/safe*",
-#endif
-        "/lib",
-        "/lib/libevil*.so",
-        "/lib/ld-*",
-        "/lib32",
-        "/lib32/ld-*",
-        "/lib64",
-        "/lib64/ld-*",
+        "/etc",
+        "/etc/ld.*.preload",
+        "/lib*",
+        "/lib*/libevil*.so",
+        "/lib*/ld-*",
         NULL,
 };
 
 
 static const char *licensed_symbols[] = {
-        "glusterfs_volumes_init",
-        "gf_log_init",
         "iobuf_get",
+        "epoll_wait",
         NULL,
 };
 
