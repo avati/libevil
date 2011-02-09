@@ -24,7 +24,10 @@ Gluster Licensing
 
 %build
 
-./configure --program-prefix=  --prefix=/opt/gvsa --datadir=/opt/gvsa/share --localstatedir=/var --mandir=/usr/share/man --infodir=/usr/share/info --libdir=/opt/gvsa/%{_lib}
+
+%define m32flags %(if [ "%{_target_cpu}" = "i386" ]; then echo CFLAGS=-m32; fi)
+
+./configure --prefix=/opt/gvsa --libdir=/opt/gvsa/%{_lib} %{m32flags}
 %{__make}
 
 %install
