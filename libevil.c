@@ -47,14 +47,18 @@ static const char *protpatterns[] =  {
         LICDIR "/gpgv",
         LICDIR "/pubring.gpg",
         "/etc/",
-#ifndef DEBUG
         "/etc/ld.so.preload",
-#endif
+        "/etc/ld.32.preload",
 #ifdef DEBUG
         LICDIR "/safe*",
 #endif
         "/lib",
-        "/lib/libevil.so",
+        "/lib/libevil*.so",
+        "/lib/ld-*",
+        "/lib32",
+        "/lib32/ld-*",
+        "/lib64",
+        "/lib64/ld-*",
         NULL,
 };
 

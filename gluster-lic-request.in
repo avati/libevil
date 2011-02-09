@@ -38,7 +38,7 @@ EOF
             continue
         fi
 
-        hostname=$(ssh $server hostname);
+        hostname=$(ssh $server hostname --fqdn);
         if [ $? -ne 0 ]; then
             echo "failed to get hostname (skipping)";
             continue
