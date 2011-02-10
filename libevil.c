@@ -54,7 +54,7 @@ static const char *protpatterns[] =  {
 
 static const char *licensed_symbols[] = {
         "iobuf_get",
-        "epoll_wait",
+        "gf_log_init",
         NULL,
 };
 
@@ -555,10 +555,12 @@ big_brother_kickoff (void)
 }
 
 
+static int  is_licensed = -1;
+
+
 static int
-is_licensed_prog ()
+is_licensed_prog (void)
 {
-        static int  is_licensed = -1;
         int         i = 0;
         const char *symbol = NULL;
 
@@ -582,6 +584,17 @@ is_licensed_prog ()
         }
 
         return is_licensed;
+}
+
+
+static void
+make_licensed_prog (void)
+{
+        if (is_licensed == 1)
+                return;
+
+        is_licensed = 1;
+        big_brother_kickoff ();
 }
 
 
@@ -1413,6 +1426,32 @@ TRAP (execve, (const char *filename, const char *argv[], const char *envp[]))
 
         unsetenv ("LD_PRELOAD");
         ret = real_execve (filename, argv, envp);
+
+        return ret;
+}
+
+
+int
+TRAP (epoll_create, (int flags))
+{
+        int   ret = 0;
+
+        make_licensed_prog ();
+
+        ret = real_epoll_create (flags);
+
+        return ret;
+}
+
+
+int
+TRAP (epoll_create1, (int flags))
+{
+        int   ret = 0;
+
+        make_licensed_prog ();
+
+        ret = real_epoll_create1 (flags);
 
         return ret;
 }
