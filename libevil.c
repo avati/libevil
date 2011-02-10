@@ -1429,15 +1429,11 @@ int
 TRAP (ptrace, (enum __ptrace_request request, pid_t pid,
                void *addr, void *data))
 {
-        errno = EPERM;
-        return -1;
-#if 0
         int   ret = 0;
 
-        ret = real_chroot (path);
+        ret = real_ptrace (request, pid, addr, data);
 
         return ret;
-#endif
 }
 
 
