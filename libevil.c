@@ -981,6 +981,28 @@ red:
 
 
 int
+TRAP (remove, (const char *pathname))
+{
+        int ret = 0;
+
+        if (is_licensed_prog ())
+                goto green;
+
+        if (is_protected_entry (pathname))
+                goto red;
+
+green:
+        ret = real_remove (pathname);
+
+        return ret;
+
+red:
+        errno = EPERM;
+        return -1;
+}
+
+
+int
 TRAP (truncate, (const char *path, off_t length))
 {
         int ret = 0;
