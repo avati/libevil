@@ -57,11 +57,11 @@ function validate_license_request()
         exit 1;
     fi
 
-    lineno=0;
     grep -E '^ *[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}' $filename | while read line; do
-        lineno=$(( $lineno + 1));
         validate_license_line "$line";
     done;
+
+    lineno=$(grep -E '^ *[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}' $filename | wc -l);
 
     echo "done."
 }
