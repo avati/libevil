@@ -1,6 +1,9 @@
 #!/bin/bash
 
 
+ME=$(basename $0);
+
+
 function default_expiry()
 {
     aT=$(stat -c '%X' /.epoch);
@@ -77,8 +80,51 @@ EOF
 }
 
 
+function show_help()
+{
+    cat <<EOF
+Gluster Licensing Tools, Version @PACKAGE_VERSION@."
+
+Usage:  $ME [-h]
+
+Display Gluster license information.
+
+Miscellaneous:
+  -h                        display this help and exit
+
+Example:
+  $ME
+EOF
+}
+
+
 function main()
 {
+    # Parse command line arguments.
+    while getopts :h OPT; do
+	case "$OPT" in
+	    h)
+		show_help
+		exit 0
+		;;
+	    \?)
+                # getopts issues an error message
+		echo "Invalid option: -$OPTARG"
+		show_help
+		exit 1
+		;;
+	esac
+    done
+
+    # Remove the switches we parsed above.
+    shift `expr $OPTIND - 1`
+
+    # We want no non-option argument.
+    if [ $# -ne 0 ]; then
+	show_help
+	exit 1
+    fi
+
     macid=$(cat /.epoch 2>/dev/null);
 
     if [ -z "$macid" ]; then
