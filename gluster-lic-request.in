@@ -7,7 +7,7 @@ ME=$(basename $0);
 function show_help()
 {
     cat <<EOF
-Gluster Licensing Tools, Version @PACKAGE_VERSION@."
+Gluster Licensing Tools, Version @PACKAGE_VERSION@.
 
 Usage:  $ME [-h]
 
