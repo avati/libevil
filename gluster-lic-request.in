@@ -49,7 +49,10 @@ function main()
 	exit 1
     fi
 
-    server_list=$(gluster peer status 2>/dev/null | grep -i hostname: | cut -f2 -d: );
+    # if 'glusterd' is not running, the 'gluster peer status' will never succeed. hence
+    # we need a mechanism to get the server list with cli
+    #server_list=$(gluster peer status 2>/dev/null | grep -i hostname: | cut -f2 -d: );
+    server_list=$(cat /etc/glusterd/peers/* 2>/dev/null | grep -i hostname1: | cut -f2 -d: );
     now=$(date '+%s');
     environment="Virtual";
 
