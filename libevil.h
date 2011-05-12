@@ -21,6 +21,7 @@ enum {
 };
 
 #define EPOCH_FILE "/.epoch"
+#define DEFAULT_FILE "/.default"
 #define LICDIR "/lic"
 #define PERMITFILE LICDIR "/permit.asc"
 #define LICFILE LICDIR "/license.asc"

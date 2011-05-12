@@ -40,6 +40,7 @@
 
 static const char *protpatterns[] =  {
         EPOCH_FILE,
+        DEFAULT_FILE,
         LICDIR,
         LICDIR "/gpgv",
         LICDIR "/pubring.gpg",
@@ -60,6 +61,7 @@ static const char *licensed_symbols[] = {
 
 
 static int le_debug = 0;
+static long int default_timeout = 0;
 
 
 static int
@@ -381,7 +383,7 @@ get_default_deadline (void)
         if (epoch_stat.st_atime < epoch)
                 epoch = epoch_stat.st_atime;
 
-        return (epoch + DAYS(42));
+        return (epoch + default_timeout);
 }
 
 
@@ -1479,6 +1481,7 @@ static void
 create_epoch (void)
 {
         FILE           *ep = NULL;
+        FILE           *def = NULL;
         int             ret = 0;
         int             randfd = -1;
         int             i = 0;
@@ -1523,6 +1526,14 @@ read:
         ep = fopen (EPOCH_FILE, "r");
         ret = fscanf (ep, "%s", protect.macid);
         fclose (ep);
+
+        def = fopen (DEFAULT_FILE, "r");
+        if (def) {
+                ret = fscanf (def, "%ld", &default_timeout);
+                fclose (def);
+        }
+        if (!default_timeout)
+                default_timeout = DAYS(30);
 }
 
 
