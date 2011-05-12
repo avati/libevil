@@ -1,6 +1,6 @@
 EXTRA_DIST = autogen.sh COPYING INSTALL build-static-gpg.sh gluster-lic.spec
 
-bin_SCRIPTS = gluster-lic-request gluster-lic-setup gluster-lic-install gluster-lic-sign gluster-lic-info
+bin_SCRIPTS = gluster-lic-request gluster-lic-setup gluster-lic-install gluster-lic-sign gluster-lic-info gluster-lic-register
 bin_PROGRAMS = gpgv
 
 etc_profile_d_SCRIPTS = gluster-lic.sh

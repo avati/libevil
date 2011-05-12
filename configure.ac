@@ -21,6 +21,7 @@ AM_INIT_AUTOMAKE
 AC_CONFIG_FILES([Makefile
                 gluster-lic-setup
                 gluster-lic-request
+                gluster-lic-register
                 gluster-lic-install
                 gluster-lic-sign
                 gluster-lic-info

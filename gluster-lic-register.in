@@ -1,0 +1,80 @@
+#!/bin/bash
+#
+# chkconfig: 35 99 12
+# description: Register this instance with Gluster
+#
+
+
+ME=$(basename $0);
+
+
+function show_help()
+{
+    cat <<EOF
+Gluster Licensing Tools, Version @PACKAGE_VERSION@.
+
+Usage:  $ME [-h]
+
+Register AMI ID with Gluster
+
+Miscellaneous:
+  -h                        display this help and exit
+
+Example:
+  $ME
+EOF
+}
+
+
+function gluster_pingback()
+{
+    sleep 5; # wait for metastrap
+
+    macid=$(cat /.epoch);
+    region=$(wget -q -O - http://169.254.169.254/latest/meta-data/placement/availability-zone);
+
+    if [ -z "$region" ]; then
+        return;
+    fi
+
+    if [ -f @prefix@/etc/ec2-pk.pem ]; then
+        # this instance got meta-strapped, so has to be an added node
+        Added=1
+    else
+        Added=0
+    fi
+
+    url="http://www.gluster.com/check4updates.php?AMIID=$macid&Region=$region&AddNode=$Added";
+
+    wget -q $url;
+
+    echo $url > /lic/.registered;
+}
+
+
+function main()
+{
+    # Parse command line arguments.
+    while getopts :h OPT; do
+	case "$OPT" in
+	    h)
+		show_help
+		exit 0
+		;;
+	    \?)
+                # getopts issues an error message
+		echo "Invalid option: -$OPTARG"
+		show_help
+		exit 1
+		;;
+	esac
+    done
+
+    if [ ! -f /.default -o -f /lic/.registered ]; then
+        exit 0;
+    fi
+
+    gluster_pingback &
+}
+
+main "$@";

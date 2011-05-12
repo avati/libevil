@@ -45,13 +45,16 @@ Gluster Licensing
 /opt/gvsa/bin/gluster-lic-request
 /opt/gvsa/bin/gluster-lic-info
 /opt/gvsa/bin/gluster-lic-sign
+/opt/gvsa/bin/gluster-lic-register
 /opt/gvsa/%{_lib}/libevil.so
 /opt/gvsa/bin/gpgv
 
 
 %post
 cp /opt/gvsa/bin/gluster-lic-setup /etc/init.d
+cp /opt/gvsa/bin/gluster-lic-register /etc/init.d
 chkconfig gluster-lic-setup on
+chkconfig gluster-lic-register on
 
 
 %changelog
