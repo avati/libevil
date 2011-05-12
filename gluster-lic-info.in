@@ -4,7 +4,7 @@
 ME=$(basename $0);
 
 
-function default_expiry()
+function epoch()
 {
     aT=$(stat -c '%X' /.epoch);
     mT=$(stat -c '%Y' /.epoch);
@@ -13,6 +13,16 @@ function default_expiry()
     dE=$((echo $aT; echo $mT; echo $cT) | sort -n | head -n 1);
 
     echo $dE;
+}
+
+
+function food()
+{
+    if [ -f /.default ]; then
+        delta=$(cat /.default);
+    else
+        delta=$((30 * 24 * 3600));
+    fi
 }
 
 
@@ -27,14 +37,11 @@ function say_and_die()
     case "$mode" in
         unlicensed)
             cat <<EOF
-This system is unlicensed. To obtain a license you have to first generate
-a license request and get it signed. Note that a license request is for the
-entire cluster of systems and therefore you need to first start all your
-systems (ensure ssh connectivity among them) and peer probe them all as well.
+Congratulations! You have been granted a five day operational license for
+Gluster.  To extend this license to 30-days, or to get your questions
+answered by an engineer, please visit:
 
-To generate a license request, run this command and follow the instructions:
-
-  sh# gluster-lic-request
+  http://www.gluster.com/ami-register?AMIID=$macid
 
 EOF
             ;;
@@ -146,7 +153,7 @@ EOF
 
     now=$(date '+%s');
 
-    def_expire=$(( $(default_expiry) + 30 * 24 * 3600 ));
+    def_expire=$(( $(epoch) + $(food) ));
 
     if [ ! -f /lic/license.asc ]; then
         expire=$def_expire;
