@@ -23,6 +23,8 @@ function food()
     else
         delta=$((30 * 24 * 3600));
     fi
+
+    echo $delta;
 }
 
 
