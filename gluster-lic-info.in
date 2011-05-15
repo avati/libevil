@@ -99,7 +99,7 @@ EOF
         days=$(($delta / (3600 * 24)));
 	if [ "$mode" = "unlicensed" ]; then
             cat <<EOF
-This system is in trial for the next $days day(s), till $(date -u --date="1970-01-01 00:00:00 $expire seconds").
+The trial will expire in $days day(s), on $(date -u --date="1970-01-01 00:00:00 $expire seconds").
 EOF
 	else
             cat <<EOF
