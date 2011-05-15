@@ -38,14 +38,35 @@ function say_and_die()
 
     case "$mode" in
         unlicensed)
-            cat <<EOF
-Congratulations! You have been granted a five day operational license for
-Gluster.  To extend this license to 30-days, or to get your questions
-answered by an engineer, please visit:
+            if [ -f /.default ]; then
+                cat <<EOF
+
+********************************************************************************
+************************* ACTIVATE 30-DAY TRIAL NOW ****************************
+********************************************************************************
+
+
+You have been granted a limited, five day operational license for Gluster.
+
+To get a free full featured 30-day license with detailed documentation and access
+to engineering support, please copy and paste the following URL in your browser:
 
   http://www.gluster.com/ami-register?AMIID=$macid
 
 EOF
+            else
+                cat <<EOF
+This system is unlicensed. To obtain a license you have to first generate
+a license request and get it signed. Note that a license request is for the
+entire cluster of systems and therefore you need to first start all your
+systems (ensure ssh connectivity among them) and peer probe them all as well.
+
+To generate a license request, run this command and follow the instructions:
+
+  sh# gluster-lic-request
+
+EOF
+            fi
             ;;
         invalid_license)
             cat <<EOF
