@@ -32,6 +32,9 @@ Gluster Licensing
 %install
 %{__rm} -rf %{buildroot}
 %{__make} install DESTDIR=%{buildroot}
+%{__install} -d -m0755 %{buildroot}%{_initrddir}
+%{__install} -p -m0755 gluster-lic-setup %{buildroot}%{_initrddir}
+%{__install} -p -m0755 gluster-lic-register %{buildroot}%{_initrddir}
 
 
 %clean
@@ -48,13 +51,13 @@ Gluster Licensing
 /opt/gvsa/bin/gluster-lic-register
 /opt/gvsa/%{_lib}/libevil.so
 /opt/gvsa/bin/gpgv
+%{_initrddir}/gluster-lic-setup
+%{_initrddir}/gluster-lic-register
 
 
 %post
-cp /opt/gvsa/bin/gluster-lic-setup /etc/init.d
-cp /opt/gvsa/bin/gluster-lic-register /etc/init.d
-chkconfig gluster-lic-setup on
-chkconfig gluster-lic-register on
+chkconfig --add gluster-lic-setup
+chkconfig --add gluster-lic-register
 
 
 %changelog
