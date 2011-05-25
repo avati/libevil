@@ -89,8 +89,11 @@ EOF
 
         hostname=$(ssh $server hostname --fqdn);
         if [ $? -ne 0 ]; then
-            echo "failed to get hostname (skipping)";
-            continue
+            hostname=$(ssh $server hostname);
+            if [ $? -ne 0 ]; then
+		echo "failed to get hostname (skipping)";
+		continue
+	    fi
         fi
 
         echo "($macid $hostname)"
