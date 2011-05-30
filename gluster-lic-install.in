@@ -72,22 +72,6 @@ function main()
     #server_list=$(gluster peer status 2>/dev/null | grep -i hostname: | cut -f2 -d: );
     server_list=$(cat /etc/glusterd/peers/* 2>/dev/null | grep -i hostname1= | cut -f2 -d= );
 
-    if [ -z "$server_list" ]; then
-        cat <<EOF
-
-You do not seem to have a Gluster cluster setup yet. Please prepare the cluster
-by building a trusted network of Gluster servers using the command.
-
-  sh# gluster peer probe <HOSTNAME>
-
-For more information refer the documentation available at
-
-  http://www.gluster.com/community/documentation/
-
-EOF
-        exit
-    fi
-
     validate_license $1;
 
     for server in $server_list localhost; do

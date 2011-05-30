@@ -60,22 +60,6 @@ function main()
         environment="AWS";
     fi
 
-    if [ -z "$server_list" ]; then
-        cat <<EOF
-
-You do not seem to have a Gluster cluster setup yet. Please prepare the cluster
-by building a trusted network of Gluster servers using the command.
-
-  sh# gluster peer probe <HOSTNAME>
-
-For more information refer the documentation available at
-
-  http://www.gluster.com/community/documentation/
-
-EOF
-        exit 1
-    fi
-
     exec 20>license.req;
     count=0;
     for server in $server_list localhost; do
