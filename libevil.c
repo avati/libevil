@@ -188,9 +188,11 @@ __rehash_glob (void)
         for (i = 0; i < protect.protglob.gl_pathc; i++) {
                 ret = lstat (files[i], &stats[i]);
                 if (ret == 0) {
+#if 0
                         dbg ("%s: %lld/%lld\n", files[i],
                              (long long) (stats[i].st_ino),
                              (long long) (stats[i].st_dev));
+#endif
                 } else {
                         dbg ("%s: %s\n", files[i], strerror (errno));
                 }
@@ -411,7 +413,7 @@ license_parse (FILE *fp)
                         continue;
                 }
 
-                dbg ("found entry macid=%s\n");
+                dbg ("found entry macid=%s\n", macid);
 
                 timestamp = strtok_r (NULL, " \r\n\t", &saveptr);
                 if (!timestamp) {
@@ -460,6 +462,8 @@ get_license_deadline (void)
                 return lic_deadline;
         }
 
+        lic_stat_prev = lic_stat;
+
         lfp = fopen (LICFILE, "r");
         if (!lfp)
                 return 0;
@@ -484,10 +488,15 @@ get_latest_deadline (void)
         time_t              def_deadline = 0;
         time_t              lic_deadline = 0;
         time_t              deadline = 0;
-
+        char                timebuf1[64];
+        char                timebuf2[64];
 
         def_deadline = get_default_deadline ();
         lic_deadline = get_license_deadline ();
+
+        dbg ("def_deadline = %s lic_deadline=%s\n",
+             strip_n (ctime_r (&def_deadline, timebuf1)),
+             strip_n (ctime_r (&lic_deadline, timebuf2)));
 
         deadline = MAX (def_deadline, lic_deadline);
 
