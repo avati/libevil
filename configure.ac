@@ -14,7 +14,7 @@ dnl
 dnl You should have received a copy of the GNU Affero General Public License
 dnl along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([gluster-lic],[0.4],[support@gluster.com])
+AC_INIT([gluster-lic],[0.5],[support@gluster.com])
 
 AM_INIT_AUTOMAKE
 
