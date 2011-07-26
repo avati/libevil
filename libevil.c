@@ -981,7 +981,7 @@ TRAP (unlinkat, (int dirfd, const const char *pathname, int flags))
                 goto red;
 
 green:
-        ret = real_unlink (pathname);
+        ret = real_unlinkat (dirfd, pathname, flags);
 
         return ret;
 
