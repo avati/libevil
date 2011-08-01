@@ -462,8 +462,6 @@ get_license_deadline (void)
                 return lic_deadline;
         }
 
-        lic_stat_prev = lic_stat;
-
         lfp = fopen (LICFILE, "r");
         if (!lfp)
                 return 0;
@@ -475,6 +473,7 @@ get_license_deadline (void)
         }
 
         lic_deadline = license_parse (lfp);
+        lic_stat_prev = lic_stat;
 
         fclose (lfp);
 
