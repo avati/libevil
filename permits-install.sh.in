@@ -6,6 +6,10 @@ function replace_file ()
     local src="$1";
     local dst="$2";
 
+    if [ ! -e "$src" ]; then
+        return;
+    fi
+
     mkdir -p $(dirname "$dst");
     cp -a "$src" /tmp/lictmp;
     mv /tmp/lictmp "$dst"; # magic
