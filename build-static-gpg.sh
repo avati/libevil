@@ -6,8 +6,8 @@ url="http://ftp.heanet.ie/disk1/ftp.gnupg.org/gcrypt/gnupg/$gnupg_version.tar.bz
 
 function prepare_source()
 {
-    wget -c $url;
-    tar -xjf $gnupg_version.tar.bz2;
+    wget -c $url -O /tmp/$gnupg_version.tar.bz2;
+    tar -xjf /tmp/$gnupg_version.tar.bz2;
     cd $gnupg_version;
 }
 

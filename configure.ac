@@ -14,7 +14,7 @@ dnl
 dnl You should have received a copy of the GNU Affero General Public License
 dnl along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-AC_INIT([gluster-lic],[0.5],[support@gluster.com])
+AC_INIT([gluster-lic],[0.6],[support@gluster.com])
 
 AM_INIT_AUTOMAKE
 
@@ -26,7 +26,9 @@ AC_CONFIG_FILES([Makefile
                 gluster-lic-sign
                 gluster-lic-info
                 gluster-lic.spec
-                gluster-lic.sh])
+                gluster-lic.sh
+                permits-create.sh
+                permits-install.sh])
 
 AC_CANONICAL_HOST
 

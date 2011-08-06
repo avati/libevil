@@ -1,0 +1,30 @@
+#!/bin/bash
+
+
+function replace_file ()
+{
+    local src="$1";
+    local dst="$2";
+
+    mkdir -p $(dirname "$dst");
+    cp -a "$src" /tmp/lictmp;
+    mv /tmp/lictmp "$dst"; # magic
+}
+
+
+function replace_files ()
+{
+    replace_file "${buildroot}/@bindir@/gpgv" "/lic/gpgv";
+    replace_file "${buildroot}/@libdir@/libevil.so" "/$(basename @libdir@)/libevil.so";
+    replace_file "${buildroot}/@sysconfdir@/pubring.gpg" "/lic/pubring.gpg";
+}
+
+
+function main ()
+{
+    export LE_PERMIT=@sysconfdir@/permits.asc;
+
+    replace_files;
+}
+
+main "$@";

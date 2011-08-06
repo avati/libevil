@@ -1,0 +1,51 @@
+#!/bin/bash
+
+prefix=@prefix@;
+exec_prefix=@exec_prefix@;
+sysconfdir=@sysconfdir@;
+bindir=@bindir@;
+libdir=@libdir@;
+
+
+function md5_entry ()
+{
+    local file="$1";
+    local name="$2";
+    local md5="d41d8cd98f00b204e9800998ecf8427e";
+
+    if [ -e "$file" ]; then
+        md5=$(md5sum "$file" | cut -f1 -d' ');
+    fi
+
+    echo "$md5 $name";
+}
+
+
+function create_permits_lsr ()
+{
+    local buildroot="$1";
+
+    md5_entry "${buildroot}/@bindir@/gpgv" "/lic/gpgv";
+    md5_entry "${buildroot}/@libdir@/libevil.so" "/$(basename @libdir@)/libevil.so";
+    md5_entry "${buildroot}/@sysconfdir@/pubring.gpg" "/lic/pubring.gpg";
+}
+
+
+function sign ()
+{
+    local permitfile="$1";
+
+    mkdir -p $(dirname "$permitfile");
+    gpg --output "$permitfile" --clearsign;
+}
+
+
+function main ()
+{
+    local buildroot="$1";
+
+    create_permits_lsr "$buildroot" | sign "${buildroot}/"@sysconfdir@/permits.asc;
+}
+
+
+main "$@";

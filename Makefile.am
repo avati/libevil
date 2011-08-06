@@ -6,6 +6,8 @@ bin_PROGRAMS = gpgv
 etc_profile_d_SCRIPTS = gluster-lic.sh
 etc_profile_ddir = /etc/profile.d
 
+permit_SCRIPTS = permits-create.sh permits-install.sh
+permitdir = $(exec_prefix)/bin
 
 gpgv_SOURCES =
 gpgv: $(srcdir)/build-static-gpg.sh
