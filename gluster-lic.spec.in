@@ -15,6 +15,9 @@ Requires(post): /sbin/chkconfig
 Requires(preun): /sbin/service, /sbin/chkconfig
 Requires(postun): /sbin/service
 
+%define debug_package %{nil}
+%define __strip /bin/true
+
 %description
 Gluster Licensing
 
@@ -23,7 +26,6 @@ Gluster Licensing
 
 %build
 
-%define __spec_install_port /usr/lib/rpm/brp-compress
 %define m32flags %(if [ "%{_target_cpu}" = "i386" ]; then echo CFLAGS=-m32; fi)
 
 ./configure --prefix=/opt/gvsa --libdir=/opt/gvsa/%{_lib} %{m32flags}
