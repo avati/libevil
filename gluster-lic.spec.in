@@ -57,6 +57,7 @@ Gluster Licensing
 /opt/gvsa/%{_lib}/libevil.so
 /opt/gvsa/bin/gpgv
 /opt/gvsa/etc/permits*.asc
+/opt/gvsa/etc/pubring.gpg
 %{_initrddir}/gluster-lic-setup
 %{_initrddir}/gluster-lic-register
 

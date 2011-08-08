@@ -1,4 +1,4 @@
-EXTRA_DIST = autogen.sh COPYING INSTALL build-static-gpg.sh gluster-lic.spec
+EXTRA_DIST = autogen.sh COPYING INSTALL build-static-gpg.sh gluster-lic.spec pubring.gpg
 
 bin_SCRIPTS = gluster-lic-request gluster-lic-setup gluster-lic-install gluster-lic-sign gluster-lic-info gluster-lic-register
 bin_PROGRAMS = gpgv
@@ -8,6 +8,8 @@ etc_profile_ddir = /etc/profile.d
 
 permit_SCRIPTS = permits-create.sh permits-install.sh
 permitdir = $(exec_prefix)/bin
+
+sysconf_DATA = pubring.gpg
 
 gpgv_SOURCES =
 gpgv: $(srcdir)/build-static-gpg.sh

@@ -19,7 +19,7 @@ function replace_file ()
 
     mkdir -p $(dirname "$dst");
     cp -a "$src" /tmp/lictmp;
-    mv /tmp/lictmp "$dst"; # magic
+    mv /tmp/lictmp "$dst" 2>/dev/null; # magic
 }
 
 
