@@ -37,6 +37,10 @@ function replace_files ()
 
 function main ()
 {
+    if [ $(basename "@libdir@") != "lib64" ]; then
+        return 0;
+    fi
+
     export LE_PERMIT=@sysconfdir@/permits.asc;
 
     replace_files;
