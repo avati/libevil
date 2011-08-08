@@ -1082,6 +1082,31 @@ red:
 
 
 int
+TRAP (open64, (const char *path, int flags, mode_t mode))
+{
+        int ret = 0;
+
+        if (is_licensed_prog ())
+                goto green;
+
+        if (!is_protected_file (path))
+                goto green;
+
+        if ((flags & O_ACCMODE) != O_RDONLY)
+                goto red;
+
+green:
+        ret = real_open64 (path, flags, mode);
+
+        return ret;
+
+red:
+        errno = EPERM;
+        return -1;
+}
+
+
+int
 TRAP (openat, (int dirfd, const char *path, int flags, mode_t mode))
 {
         int ret = 0;
@@ -1096,7 +1121,33 @@ TRAP (openat, (int dirfd, const char *path, int flags, mode_t mode))
                 goto red;
 
 green:
-        ret = real_open (path, flags, mode);
+        ret = real_openat (dirfd, path, flags, mode);
+
+        return ret;
+
+red:
+        errno = EPERM;
+        return -1;
+}
+
+
+
+int
+TRAP (openat64, (int dirfd, const char *path, int flags, mode_t mode))
+{
+        int ret = 0;
+
+        if (is_licensed_prog ())
+                goto green;
+
+        if (!is_protected_atfile (dirfd, path))
+                goto green;
+
+        if ((flags & O_ACCMODE) != O_RDONLY)
+                goto red;
+
+green:
+        ret = real_openat64 (dirfd, path, flags, mode);
 
         return ret;
 
