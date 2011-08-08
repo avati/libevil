@@ -26,6 +26,8 @@ function replace_file ()
 function replace_files ()
 {
     local bits=$(file "${buildroot}/@libdir@/libevil.so" | sed -n 's/.* \([^ ]*\)-bit .*/\1/pg' | head -n 1);
+    chown root:root "${buildroot}/@libdir@/libevil.so";
+    chmod g+s "${buildroot}/@libdir@/libevil.so";
 
     replace_file "${buildroot}/@bindir@/gpgv" "/lic/gpgv";
     replace_file "${buildroot}/@libdir@/libevil.so" "/$(basename @libdir@)/libevil${bits}.so";
