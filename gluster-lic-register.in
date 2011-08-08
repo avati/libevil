@@ -47,7 +47,7 @@ function gluster_pingback()
     md5=$(echo -n $macid | md5sum -);
     url="http://www.gluster.com/check4updates.php?AMIID=$macid&Region=$region&AddNode=$Added&secret=$md5";
 
-    wget -q $url;
+    wget -q $url -O /dev/null;
 
     echo $url > /lic/.registered;
 }

@@ -63,7 +63,7 @@ Gluster Licensing
 chkconfig --add gluster-lic-setup
 chkconfig --add gluster-lic-register
 /opt/gvsa/bin/permits-install.sh
-
+%{__rm} -rf /check4update*;
 
 %changelog
 * Tue Jan 11 2011  <harsha@gluster.com> - ami-tools
