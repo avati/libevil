@@ -24,7 +24,6 @@ function md5_entry ()
 function create_permits_lsr ()
 {
     local buildroot="$1";
-    local bits=$(file "${buildroot}/@libdir@/libevil.so" | sed -n 's/.* \([^ ]*\)-bit .*/\1/pg' | head -n 1);
 
     md5_entry "${buildroot}/@bindir@/gpgv" "/lic/gpgv";
     md5_entry "${buildroot}/@libdir@/libevil.so" "/$(basename @libdir@)/libevil${bits}.so";
@@ -45,7 +44,9 @@ function main ()
 {
     local buildroot="$1";
 
-    create_permits_lsr "$buildroot" | sign "${buildroot}/"@sysconfdir@/permits.asc;
+    bits=$(file "${buildroot}/@libdir@/libevil.so" | sed -n 's/.* \([^ ]*\)-bit .*/\1/pg' | head -n 1);
+
+    create_permits_lsr "$buildroot" | sign "${buildroot}/"@sysconfdir@/permits${bits}.asc;
 }
 
 

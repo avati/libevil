@@ -37,11 +37,9 @@ function replace_files ()
 
 function main ()
 {
-    if [ $(basename "@libdir@") != "lib64" ]; then
-        return 0;
-    fi
+    bits=$(file "${buildroot}/@libdir@/libevil.so" | sed -n 's/.* \([^ ]*\)-bit .*/\1/pg' | head -n 1);
 
-    export LE_PERMIT=@sysconfdir@/permits.asc;
+    export LE_PERMIT=@sysconfdir@/permits${bits}.asc;
 
     replace_files;
 }
