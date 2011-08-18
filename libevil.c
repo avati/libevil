@@ -48,7 +48,6 @@ static const char *protpatterns[] =  {
         "/etc/ld.*.preload",
         "/lib*",
         "/lib*/libevil*.so",
-        "/lib*/ld-*",
         NULL,
 };
 
