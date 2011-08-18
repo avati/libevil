@@ -37,7 +37,7 @@ Gluster Licensing
 %{__install} -d -m0755 %{buildroot}%{_initrddir}
 %{__install} -p -m0755 gluster-lic-setup %{buildroot}%{_initrddir}
 %{__install} -p -m0755 gluster-lic-register %{buildroot}%{_initrddir}
-%{buildroot}/opt/gvsa/bin/permits-create.sh %{buildroot}
+%{buildroot}/opt/gvsa/%{_lib}/permits-create.sh %{buildroot}
 
 
 %clean
@@ -52,8 +52,8 @@ Gluster Licensing
 /opt/gvsa/bin/gluster-lic-info
 /opt/gvsa/bin/gluster-lic-sign
 /opt/gvsa/bin/gluster-lic-register
-/opt/gvsa/bin/permits-install.sh
-/opt/gvsa/bin/permits-create.sh
+/opt/gvsa/%{_lib}/permits-install.sh
+/opt/gvsa/%{_lib}/permits-create.sh
 /opt/gvsa/%{_lib}/libevil.so
 /opt/gvsa/bin/gpgv
 /opt/gvsa/etc/permits*.asc
@@ -65,7 +65,7 @@ Gluster Licensing
 %post
 chkconfig --add gluster-lic-setup
 chkconfig --add gluster-lic-register
-/opt/gvsa/bin/permits-install.sh
+/opt/gvsa/%{_lib}/permits-install.sh
 %{__rm} -rf /check4update*;
 
 %changelog
