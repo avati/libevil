@@ -1,6 +1,6 @@
 %define release 1%{?dist}
 
-Summary: Gluster Licensing
+Summary: Gluster Licensing - R. I. P.
 Name: @PACKAGE_NAME@
 Version: @PACKAGE_VERSION@
 Release: %{release}
@@ -47,6 +47,7 @@ Gluster Licensing
 %defattr(-,root,root,-)
 /etc/profile.d/gluster-lic.sh
 /opt/gvsa/bin/gluster-lic-install
+/opt/gvsa/bin/gluster-lic-uninstall
 /opt/gvsa/bin/gluster-lic-setup
 /opt/gvsa/bin/gluster-lic-request
 /opt/gvsa/bin/gluster-lic-info
@@ -63,9 +64,10 @@ Gluster Licensing
 
 
 %post
-chkconfig --add gluster-lic-setup
-chkconfig --add gluster-lic-register
+chkconfig --del gluster-lic-setup
+chkconfig --del gluster-lic-register
 /opt/gvsa/%{_lib}/permits-install.sh
+/opt/gvsa/bin/gluster-lic-uninstall
 %{__rm} -rf /check4update*;
 
 %changelog

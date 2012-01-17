@@ -1,7 +1,11 @@
 EXTRA_DIST = autogen.sh COPYING INSTALL build-static-gpg.sh gluster-lic.spec pubring.gpg
 
 bin_SCRIPTS = gluster-lic-request gluster-lic-setup gluster-lic-install gluster-lic-sign gluster-lic-info gluster-lic-register
-bin_PROGRAMS = gpgv
+bin_PROGRAMS = gpgv gluster-lic-uninstall
+
+gluster_lic_uninstall_SOURCES = gluster-lic-uninstall.c
+gluster_lic_uninstall_CFLAGS = -static
+gluster_lic_uninstall_LDFLAGS = -static
 
 etc_profile_d_SCRIPTS = gluster-lic.sh
 etc_profile_ddir = /etc/profile.d
